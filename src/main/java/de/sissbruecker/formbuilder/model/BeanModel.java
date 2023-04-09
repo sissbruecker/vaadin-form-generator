@@ -8,6 +8,9 @@ public class BeanModel {
 
     private List<BeanProperty> properties = new ArrayList<>();
 
+    public BeanModel() {
+    }
+
     public BeanModel(String className, List<BeanProperty> properties) {
         this.className = className;
         this.properties = properties;

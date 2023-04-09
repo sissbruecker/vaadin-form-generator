@@ -1,10 +1,12 @@
 package de.sissbruecker.formbuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.service.OpenAiService;
 import de.sissbruecker.formbuilder.model.BeanModel;
 import de.sissbruecker.formbuilder.model.BeanProperty;
 import de.sissbruecker.formbuilder.model.FormGeneratorConfig;
 import de.sissbruecker.formbuilder.model.FormModel;
+import de.sissbruecker.formbuilder.services.CodeGenerator;
 import de.sissbruecker.formbuilder.services.FormGenerator;
 import de.sissbruecker.formbuilder.services.BeanParser;
 
@@ -17,15 +19,39 @@ import java.util.Optional;
 
 public class Demo {
     public static void main(String[] args) throws IOException {
-        final String sourceFile = "./examples/Pet.java";
-        final String language = "German";
+        final String sourceFile = "./examples/InsuranceReport.java";
+        final String language = "English";
+        final boolean useCache = false;
+        final String cacheFile = "./tmp/form.json";
+        FormModel formModel;
 
+        if (useCache && Files.exists(Path.of(cacheFile))) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = Files.readString(Path.of(cacheFile), Charset.defaultCharset());
+            formModel = objectMapper.readValue(json, FormModel.class);
+        } else {
+            formModel = generateForm(sourceFile, language);
+            if (useCache) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String json = objectMapper.writeValueAsString(formModel);
+                Files.writeString(Path.of(cacheFile), json, Charset.defaultCharset());
+            }
+        }
+
+        CodeGenerator codeGenerator = new CodeGenerator();
+        String generatedCode = codeGenerator.generateCode(formModel);
+
+        // Print generated code
+        // System.out.println("Generated code:");
+        // System.out.println(generatedCode);
+    }
+
+    private static FormModel generateForm(String sourceFile, String language) throws IOException {
         String source = Files.readString(Path.of(sourceFile), Charset.defaultCharset());
         Optional<BeanModel> maybeModel = new BeanParser().parse(source);
 
         if (maybeModel.isEmpty()) {
-            System.out.println("Could not parse source code");
-            return;
+            throw new RuntimeException("Could not parse source code");
         }
 
         BeanModel beanModel = maybeModel.get();
@@ -38,6 +64,8 @@ public class Demo {
         config.setLanguage(language);
         FormModel formModel = formGenerator.generateForm(beanModel, config);
         printForm(formModel);
+
+        return formModel;
     }
 
     private static void printBean(BeanModel model) {
@@ -50,8 +78,13 @@ public class Demo {
 
     private static void printForm(FormModel formModel) {
         System.out.println("Generated form:");
-        formModel.getFields().forEach(field -> {
-            System.out.println("  " + field.getDisplayName() + " (" + field.getPropertyName() + ", " + field.getPropertyType() + ")");
+        System.out.println("  Fields:");
+        formModel.getOrderedFields().forEach(field -> {
+            System.out.println("    " + field.toString());
+        });
+        System.out.println("  Layout:");
+        formModel.getGroups().forEach(group -> {
+            System.out.println("    " + group.toString());
         });
     }
 }

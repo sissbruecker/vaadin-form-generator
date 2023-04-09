@@ -63,14 +63,6 @@ public class Pet {
     @OrderBy("visit_date ASC")
     private Set<Visit> visits = new LinkedHashSet<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setDob(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
@@ -93,6 +85,14 @@ public class Pet {
 
     public void setAdditionalInformation(String additionalInformation) {
         this.additionalInformation = additionalInformation;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isVaccinated() {

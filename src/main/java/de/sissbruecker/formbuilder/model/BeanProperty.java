@@ -4,6 +4,9 @@ public class BeanProperty {
     private String name;
     private String type;
 
+    public BeanProperty() {
+    }
+
     public BeanProperty(String name, String type) {
         this.name = name;
         this.type = type;

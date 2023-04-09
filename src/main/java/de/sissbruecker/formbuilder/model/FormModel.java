@@ -1,12 +1,21 @@
 package de.sissbruecker.formbuilder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class FormModel {
-    private final BeanModel beanModel;
+    private BeanModel beanModel;
+    private String purpose;
 
-    private final List<FormField> fields;
+    private List<FormField> fields = new ArrayList<>();
+
+    private List<FieldGroup> groups = new ArrayList<>();
+
+    public FormModel() {
+    }
 
     public FormModel(BeanModel beanModel) {
         this.beanModel = beanModel;
@@ -17,11 +26,36 @@ public class FormModel {
         return beanModel;
     }
 
+    public void setBeanModel(BeanModel beanModel) {
+        this.beanModel = beanModel;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
     public List<FormField> getFields() {
         return fields;
     }
 
-    public Optional<FormField> getFieldByPropertyName(String propertyName) {
-        return fields.stream().filter(field -> field.getPropertyName().equals(propertyName)).findFirst();
+    @JsonIgnore
+    public List<FormField> getOrderedFields() {
+        return fields.stream().sorted(Comparator.comparing(FormField::getOrder)).toList();
+    }
+
+    public void setFields(List<FormField> fields) {
+        this.fields = fields;
+    }
+
+    public List<FieldGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<FieldGroup> groups) {
+        this.groups = groups;
     }
 }
