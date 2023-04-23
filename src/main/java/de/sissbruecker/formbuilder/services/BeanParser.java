@@ -7,18 +7,20 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import de.sissbruecker.formbuilder.model.BeanModel;
 import de.sissbruecker.formbuilder.model.BeanProperty;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class BeanParser {
-    public Optional<BeanModel> parse(String source) {
+    public BeanModel parse(String source) {
         CompilationUnit cu = StaticJavaParser.parse(source);
 
         Optional<ClassOrInterfaceDeclaration> maybeClassDeclaration = cu.findFirst(ClassOrInterfaceDeclaration.class);
         if (maybeClassDeclaration.isEmpty()) {
-            return Optional.empty();
+            throw new IllegalArgumentException("No class found in source code");
         }
 
         List<BeanProperty> properties = new ArrayList<>();
@@ -55,6 +57,6 @@ public class BeanParser {
             }
         }
 
-        return Optional.of(new BeanModel(maybeClassDeclaration.get().getNameAsString(), properties));
+        return new BeanModel(maybeClassDeclaration.get().getNameAsString(), properties);
     }
 }

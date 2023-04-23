@@ -1,18 +1,23 @@
 package de.sissbruecker.formbuilder.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.hilla.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class FormModel {
+    @Nonnull
     private BeanModel beanModel;
+    @Nonnull
     private String purpose;
 
-    private List<FormField> fields = new ArrayList<>();
+    @Nonnull
+    private List<@Nonnull FormField> fields = new ArrayList<>();
 
-    private List<FieldGroup> groups = new ArrayList<>();
+    @Nonnull
+    private List<@Nonnull FieldGroup> groups = new ArrayList<>();
 
     public FormModel() {
     }

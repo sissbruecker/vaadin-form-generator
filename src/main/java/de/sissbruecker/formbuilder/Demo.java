@@ -48,13 +48,7 @@ public class Demo {
 
     private static FormModel generateForm(String sourceFile, String language) throws IOException {
         String source = Files.readString(Path.of(sourceFile), Charset.defaultCharset());
-        Optional<BeanModel> maybeModel = new BeanParser().parse(source);
-
-        if (maybeModel.isEmpty()) {
-            throw new RuntimeException("Could not parse source code");
-        }
-
-        BeanModel beanModel = maybeModel.get();
+        BeanModel beanModel = new BeanParser().parse(source);
         printBean(beanModel);
 
         String openaiToken = System.getProperty("openai.token");

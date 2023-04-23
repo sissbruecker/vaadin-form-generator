@@ -1,7 +1,11 @@
 package de.sissbruecker.formbuilder.model;
 
+import dev.hilla.Nonnull;
+
 public class BeanProperty {
+    @Nonnull
     private String name;
+    @Nonnull
     private String type;
 
     public BeanProperty() {

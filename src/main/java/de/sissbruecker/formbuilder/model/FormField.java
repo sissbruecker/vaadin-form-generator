@@ -1,14 +1,21 @@
 package de.sissbruecker.formbuilder.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.hilla.Nonnull;
 
 public class FormField {
+    @Nonnull
     private BeanProperty beanProperty;
 
+    @Nonnull
     private String displayName;
+    @Nonnull
     private int order;
+    @Nonnull
     private int colSpan;
+    @Nonnull
     private FieldType fieldType;
+    @Nonnull
     private FieldType suggestedFieldType;
 
     public FormField() {

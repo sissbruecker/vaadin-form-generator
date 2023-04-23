@@ -13,6 +13,7 @@ import de.sissbruecker.formbuilder.model.FormGeneratorConfig;
 import de.sissbruecker.formbuilder.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Service
 public class FormGenerator {
     private static final Logger logger = LoggerFactory.getLogger(FormGenerator.class);
     private final OpenAiService openAiService;
@@ -36,7 +38,7 @@ public class FormGenerator {
         suggestFieldOrder(formModel);
         suggestFieldSpans(formModel);
         suggestFieldTypes(formModel);
-        suggestFieldGroups(formModel);
+        suggestFieldGroups(formModel, config);
 
         return formModel;
     }
@@ -48,11 +50,11 @@ public class FormGenerator {
                 .append("Please suggest human readable field names for the following properties, which include the property name and its Java type:\n");
         formModel.getFields().forEach(field -> prompt.append("- ").append(field.getPropertyName()).append(" (`").append(field.getPropertyType()).append("`)\n"));
         if (config.getLanguage() != null) {
-            prompt.append(String.format("The field names should be in `%s`. ", config.getLanguage()));
+            prompt.append(String.format("The field names should be in %s. ", config.getLanguage()));
         }
         prompt
                 .append("The field names should be short and descriptive. ")
-                .append("Just return the suggested field names, one per provided property, one per line. ")
+                .append("Return the field names as comma-separated values, all in one line. ")
                 .append("Do not include the provided property names or Java types in the output. ");
         logger.debug("suggestFieldNames prompt:\n{}", prompt);
 
@@ -81,7 +83,7 @@ public class FormGenerator {
                 .append(explainFormFields(formModel))
                 .append(explainPurpose(formModel))
                 .append("Please suggest a good order for the fields. ")
-                .append("Only return the fields in their new order, one per line. ");
+                .append("Only return the fields in their new order, as comma-separated values, all in one line. ");
         logger.debug("suggestFieldOrder prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
@@ -99,11 +101,11 @@ public class FormGenerator {
                 .append("Fields that typically require entering only a few characters should only span one column. ")
                 .append("Fields that might require entering more characters should span two columns. ")
                 .append("Based on the field names, please suggest how many columns each field should span. ")
-                .append("Only return the column span as digits, one per line. ");
-        logger.debug("suggestFieldLayout prompt:\n{}", prompt);
+                .append("Only return the column span as digits, one for each field in the same order as the provided fields, as comma-separated values, all in one line. ");
+        logger.debug("suggestFieldSpans prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldLayout reply:\n{}", reply);
+        logger.debug("suggestFieldSpans reply:\n{}", reply);
 
         List<String> suggestedColSpans = extractFieldList(reply, formModel.getFields().size());
         List<FormField> orderedFields = formModel.getOrderedFields();
@@ -115,7 +117,6 @@ public class FormGenerator {
                 .append(explainFormFields(formModel, true))
                 .append(explainPurpose(formModel))
                 .append("Please suggest a good UI control for each field. ")
-                .append("Only return the exact names of the UI controls, one per line. ")
                 .append("The following types of UI controls are available:\n")
                 .append("- TextField (for short text)\n")
                 .append("- TextArea (for longer text)\n")
@@ -128,7 +129,9 @@ public class FormGenerator {
                 .append("- DateTimePicker (for date and time)\n")
                 .append("- Checkbox (for booleans)\n")
                 .append("- Select (for selecting from a list of values)\n")
-                .append("- ComboBox (for selecting from a list of values and entering custom values)\n");
+                .append("- ComboBox (for selecting from a list of values and entering custom values)\n")
+                .append("\n")
+                .append("Only return the exact name of the UI control, one for each field, in the same order as the provided fields, as comma-separated values, all in one line. ");
         logger.debug("suggestFieldTypes prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
@@ -148,14 +151,16 @@ public class FormGenerator {
         });
     }
 
-    private void suggestFieldGroups(FormModel formModel) {
+    private void suggestFieldGroups(FormModel formModel, FormGeneratorConfig config) {
         StringBuilder prompt = new StringBuilder()
                 .append(explainFormFields(formModel))
                 .append(explainPurpose(formModel))
-                .append("Please suggest which fields can be logically grouped together, and also suggest a title for each group. ")
+                .append("Please suggest which fields can be logically grouped together, and also suggest a name for each group. ")
+                .append(String.format("The group name should be in %s. ", config.getLanguage()))
+                .append("Try to keep the number of groups low. ")
                 .append("Return one group per line. ")
                 .append("Each line should contain the group name, followed by the fields in that group, all separated by comma. For example:\n")
-                .append("Group name, Some field, Another field");
+                .append("Group name, Some field, Another field\n");
         logger.debug("suggestFieldGroups prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
@@ -183,7 +188,7 @@ public class FormGenerator {
     private String makeRequest(String prompt) {
         ChatCompletionRequest request = new ChatCompletionRequest();
         request.setModel("gpt-3.5-turbo");
-        request.setTemperature(0.2);
+        request.setTemperature(0.0);
         request.setMessages(List.of(createMessage("user", prompt)));
 
         ChatCompletionResult result = openAiService.createChatCompletion(request);
@@ -230,7 +235,7 @@ public class FormGenerator {
     }
 
     private List<String> extractFieldList(String reply, int expectedSize) {
-        String[] fieldList = stripNonAlphaNumeric(reply).split("\n");
+        String[] fieldList = reply.split(",");
         if (expectedSize > 0 && fieldList.length != expectedSize) {
             throw new IllegalStateException("Number of returned items does not match expected list size");
         }

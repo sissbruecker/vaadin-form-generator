@@ -1,7 +1,7 @@
 package de.sissbruecker.formbuilder.model;
 
 public class FormGeneratorConfig {
-    private String language;
+    private String language = "English";
 
     public String getLanguage() {
         return language;

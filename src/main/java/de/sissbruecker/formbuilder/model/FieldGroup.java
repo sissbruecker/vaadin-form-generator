@@ -1,10 +1,14 @@
 package de.sissbruecker.formbuilder.model;
 
+import dev.hilla.Nonnull;
+
 import java.util.List;
 
 public class FieldGroup {
+    @Nonnull
     private String name;
-    private List<String> properties;
+    @Nonnull
+    private List<@Nonnull String> properties;
 
     public String getName() {
         return name;

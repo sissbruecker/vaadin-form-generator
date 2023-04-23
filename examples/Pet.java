@@ -1,92 +1,38 @@
-/*
- * Copyright 2012-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.springframework.samples.petclinic.owner;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.samples.petclinic.model.NamedEntity;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
-import jakarta.persistence.Table;
-
-/**
- * Simple business object representing a pet.
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- */
-@Entity
-@Table(name = "pets")
 public class Pet {
-
     private String name;
+    private String species;
+    private String breed;
+    private int age;
+    private String gender;
+    private String color;
+    private boolean isNeutered;
+    private boolean isVaccinated;
+    private String microchipId;
+    private String ownerName;
+    private String ownerPhoneNumber;
+    private String vetName;
+    private String vetPhoneNumber;
 
-    @Column(name = "birth_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate birthDate;
-
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    private PetType type;
-    private String additionalInformation;
-    private boolean vaccinated;
-    private String vaccineType;
-    private boolean deceased;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "pet_id")
-    @OrderBy("visit_date ASC")
-    private Set<Visit> visits = new LinkedHashSet<>();
-
-    public void setDob(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    // Constructor
+    public Pet(String name, String species, String breed, int age, String gender, String color,
+               boolean isNeutered, boolean isVaccinated, String microchipId, String ownerName,
+               String ownerPhoneNumber, String vetName, String vetPhoneNumber) {
+        this.name = name;
+        this.species = species;
+        this.breed = breed;
+        this.age = age;
+        this.gender = gender;
+        this.color = color;
+        this.isNeutered = isNeutered;
+        this.isVaccinated = isVaccinated;
+        this.microchipId = microchipId;
+        this.ownerName = ownerName;
+        this.ownerPhoneNumber = ownerPhoneNumber;
+        this.vetName = vetName;
+        this.vetPhoneNumber = vetPhoneNumber;
     }
 
-    public LocalDate getDob() {
-        return this.birthDate;
-    }
-
-    public PetType getType() {
-        return this.type;
-    }
-
-    public void setType(PetType type) {
-        this.type = type;
-    }
-
-    public String getAdditionalInformation() {
-        return additionalInformation;
-    }
-
-    public void setAdditionalInformation(String additionalInformation) {
-        this.additionalInformation = additionalInformation;
-    }
-
+    // Getters and setters for all fields
     public String getName() {
         return name;
     }
@@ -95,36 +41,99 @@ public class Pet {
         this.name = name;
     }
 
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public boolean isNeutered() {
+        return isNeutered;
+    }
+
+    public void setNeutered(boolean neutered) {
+        isNeutered = neutered;
+    }
+
     public boolean isVaccinated() {
-        return vaccinated;
+        return isVaccinated;
     }
 
     public void setVaccinated(boolean vaccinated) {
-        this.vaccinated = vaccinated;
+        isVaccinated = vaccinated;
     }
 
-    public String getVaccineType() {
-        return vaccineType;
+    public String getMicrochipId() {
+        return microchipId;
     }
 
-    public void setVaccineType(String vaccineType) {
-        this.vaccineType = vaccineType;
+    public void setMicrochipId(String microchipId) {
+        this.microchipId = microchipId;
     }
 
-    public boolean isDeceased() {
-        return deceased;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setDeceased(boolean deceased) {
-        this.deceased = deceased;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
-    public Collection<Visit> getVisits() {
-        return this.visits;
+    public String getOwnerPhoneNumber() {
+        return ownerPhoneNumber;
     }
 
-    public void addVisit(Visit visit) {
-        getVisits().add(visit);
+    public void setOwnerPhoneNumber(String ownerPhoneNumber) {
+        this.ownerPhoneNumber = ownerPhoneNumber;
     }
 
+    public String getVetName() {
+        return vetName;
+    }
+
+    public void setVetName(String vetName) {
+        this.vetName = vetName;
+    }
+
+    public String getVetPhoneNumber() {
+        return vetPhoneNumber;
+    }
+
+    public void setVetPhoneNumber(String vetPhoneNumber) {
+        this.vetPhoneNumber = vetPhoneNumber;
+    }
 }
