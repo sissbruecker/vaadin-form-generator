@@ -46,15 +46,15 @@ public class FormGenerator {
     private void suggestFieldNames(FormModel formModel, FormGeneratorConfig config) {
         StringBuilder prompt = new StringBuilder()
                 .append(String.format("I have a list of properties from a Java class named `%s`. ", formModel.getBeanModel().getClassName()))
-                .append("I want to generate a form for it. ")
-                .append("Please suggest human readable field names for the following properties, which include the property name and its Java type:\n");
+                .append("I want to create a form for it, with one field for each property. ")
+                .append("Please suggest human readable field labels for the following properties, which include the property name and its Java type:\n");
         formModel.getFields().forEach(field -> prompt.append("- ").append(field.getPropertyName()).append(" (`").append(field.getPropertyType()).append("`)\n"));
         if (config.getLanguage() != null) {
-            prompt.append(String.format("The field names should be in %s. ", config.getLanguage()));
+            prompt.append(String.format("The labels should be in %s. ", config.getLanguage()));
         }
         prompt
-                .append("The field names should be short and descriptive. ")
-                .append("Return the field names as comma-separated values, all in one line. ")
+                .append("The labels should be short and descriptive. ")
+                .append("Return the labels as comma-separated values, all in one line. ")
                 .append("Do not include the provided property names or Java types in the output. ");
         logger.debug("suggestFieldNames prompt:\n{}", prompt);
 
@@ -69,7 +69,7 @@ public class FormGenerator {
         StringBuilder prompt = new StringBuilder()
                 .append(explainFormFields(formModel))
                 .append(String.format("We also know that the form has been created from a Java class named `%s`. ", formModel.getBeanModel().getClassName()))
-                .append("What would you say is the purpose of this form? Provide a short description, do not go into details about the individual fields.");
+                .append("What would you say is the purpose of this form? Provide a short description, do not mention the individual fields.");
         logger.debug("suggestPurpose prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
@@ -160,7 +160,9 @@ public class FormGenerator {
                 .append("Try to keep the number of groups low. ")
                 .append("Return one group per line. ")
                 .append("Each line should contain the group name, followed by the fields in that group, all separated by comma. For example:\n")
-                .append("Group name, Some field, Another field\n");
+                .append("First group name, Some field, Another field\n")
+                .append("Second group name, Some field, Another field\n")
+                .append("...\n");
         logger.debug("suggestFieldGroups prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
