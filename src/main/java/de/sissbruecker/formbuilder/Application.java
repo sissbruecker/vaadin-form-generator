@@ -2,8 +2,11 @@ package de.sissbruecker.formbuilder;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
+import de.sissbruecker.formbuilder.model.FormGeneratorSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.context.annotation.SessionScope;
 
 /**
  * The entry point of the Spring Boot application.
@@ -20,4 +23,9 @@ public class Application implements AppShellConfigurator {
         SpringApplication.run(Application.class, args);
     }
 
+    @Bean
+    @SessionScope
+    public FormGeneratorSession themeSession() {
+        return new FormGeneratorSession();
+    }
 }
