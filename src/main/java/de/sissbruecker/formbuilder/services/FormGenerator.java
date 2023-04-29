@@ -36,6 +36,7 @@ public class FormGenerator {
         suggestFieldNames(formModel, config);
         suggestPurpose(formModel);
         suggestFieldOrder(formModel);
+        // suggestFieldLength(formModel);
         suggestFieldSpans(formModel);
         suggestFieldTypes(formModel);
         suggestFieldGroups(formModel, config);
@@ -91,6 +92,18 @@ public class FormGenerator {
 
         List<String> fieldList = extractFieldList(reply, formModel.getFields().size());
         formModel.getFields().forEach(field -> field.setOrder(fieldList.indexOf(field.getDisplayName())));
+    }
+
+    private void suggestFieldLength(FormModel formModel) {
+        StringBuilder prompt = new StringBuilder()
+                .append(explainFormFields(formModel))
+                .append(explainPurpose(formModel))
+                .append("Please suggest how many characters a user would typically need to enter in each of the fields. ")
+                .append("Return the result as CSV, with the field name in the first column, and the maximum number of characters in the second column.");
+        logger.debug("suggestedFieldLengths prompt:\n{}", prompt);
+
+        String reply = makeRequest(prompt.toString());
+        logger.debug("suggestedFieldLengths reply:\n{}", reply);
     }
 
     private void suggestFieldSpans(FormModel formModel) {
