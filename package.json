@@ -189,7 +189,8 @@
     "@hilla/frontend": "$@hilla/frontend",
     "@hilla/form": "$@hilla/form",
     "@hilla/generator-typescript-plugin-backbone": "$@hilla/generator-typescript-plugin-backbone",
-    "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli"
+    "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli",
+    "highlight.js": "$highlight.js"
   },
   "vaadin": {
     "dependencies": {
@@ -291,6 +292,6 @@
       "workbox-core": "6.5.4",
       "workbox-precaching": "6.5.4"
     },
-    "hash": "c3c3b43fb6420ce97fcf583d4ad675a605295009450ccc038a541815e0648480"
+    "hash": "91e47e8bd67d146bf910402852df33efb4884ac8f1b4ca18b9fd46284892b40d"
   }
 }

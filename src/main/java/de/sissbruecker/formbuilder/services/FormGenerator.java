@@ -16,7 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -37,7 +39,9 @@ public class FormGenerator {
         suggestPurpose(formModel);
         suggestFieldOrder(formModel);
         // suggestFieldLength(formModel);
+        determineFieldSpans(formModel);
         suggestFieldSpans(formModel);
+        determineFieldTypes(formModel);
         suggestFieldTypes(formModel);
         suggestFieldGroups(formModel, config);
 
@@ -106,6 +110,32 @@ public class FormGenerator {
         logger.debug("suggestedFieldLengths reply:\n{}", reply);
     }
 
+    private void determineFieldSpans(FormModel formModel) {
+        List<String> simpleTypes = List.of(
+                "boolean",
+                "Boolean",
+                "short",
+                "Short",
+                "int",
+                "Integer",
+                "long",
+                "Long",
+                "float",
+                "Float",
+                "double",
+                "Double",
+                "Number",
+                "Date",
+                "LocalDate",
+                "LocalTime",
+                "LocalDateTime"
+        );
+
+        formModel.getFields().stream()
+                .filter(field -> simpleTypes.contains(field.getPropertyType()))
+                .forEach(field -> field.setColSpan(1));
+    }
+
     private void suggestFieldSpans(FormModel formModel) {
         StringBuilder prompt = new StringBuilder()
                 .append(explainFormFields(formModel))
@@ -122,7 +152,41 @@ public class FormGenerator {
 
         List<String> suggestedColSpans = extractFieldList(reply, formModel.getFields().size());
         List<FormField> orderedFields = formModel.getOrderedFields();
-        IntStream.range(0, suggestedColSpans.size()).forEach(i -> orderedFields.get(i).setColSpan(Integer.parseInt(suggestedColSpans.get(i))));
+        IntStream.range(0, suggestedColSpans.size()).forEach(i -> {
+            // Only use suggestion if field does not have deterministic span already
+            FormField formField = orderedFields.get(i);
+            if (formField.getColSpan() == 0) {
+                formField.setColSpan(Integer.parseInt(suggestedColSpans.get(i)));
+            }
+        });
+    }
+
+    private void determineFieldTypes(FormModel formModel) {
+        Map<String, FieldType> fieldTypeMap = new HashMap<>();
+
+        fieldTypeMap.put("boolean", FieldType.Checkbox);
+        fieldTypeMap.put("Boolean", FieldType.Checkbox);
+        fieldTypeMap.put("short", FieldType.IntegerField);
+        fieldTypeMap.put("Short", FieldType.IntegerField);
+        fieldTypeMap.put("int", FieldType.IntegerField);
+        fieldTypeMap.put("Integer", FieldType.IntegerField);
+        fieldTypeMap.put("long", FieldType.IntegerField);
+        fieldTypeMap.put("Long", FieldType.IntegerField);
+        fieldTypeMap.put("float", FieldType.NumberField);
+        fieldTypeMap.put("Float", FieldType.NumberField);
+        fieldTypeMap.put("double", FieldType.NumberField);
+        fieldTypeMap.put("Double", FieldType.NumberField);
+        fieldTypeMap.put("Number", FieldType.NumberField);
+        fieldTypeMap.put("Date", FieldType.DatePicker);
+        fieldTypeMap.put("LocalDate", FieldType.DatePicker);
+        fieldTypeMap.put("LocalTime", FieldType.TimePicker);
+        fieldTypeMap.put("LocalDateTime", FieldType.DateTimePicker);
+
+        formModel.getFields().forEach(field -> {
+            if (fieldTypeMap.containsKey(field.getPropertyType())) {
+                field.setFieldType(fieldTypeMap.get(field.getPropertyType()));
+            }
+        });
     }
 
     private void suggestFieldTypes(FormModel formModel) {
@@ -153,6 +217,12 @@ public class FormGenerator {
         List<String> fieldList = extractFieldList(reply, formModel.getFields().size());
         List<FormField> orderedFields = formModel.getOrderedFields();
         IntStream.range(0, orderedFields.size()).forEach(i -> {
+            // Only use suggestion if field does not have deterministic type already
+            FormField formField = orderedFields.get(i);
+            if (formField.getFieldType() != null) {
+                return;
+            }
+
             String fieldTypeName = fieldList.get(i);
             FieldType fieldType;
             try {
@@ -160,7 +230,7 @@ public class FormGenerator {
             } catch (IllegalArgumentException e) {
                 fieldType = FieldType.TextField;
             }
-            orderedFields.get(i).setSuggestedFieldType(fieldType);
+            formField.setSuggestedFieldType(fieldType);
         });
     }
 
