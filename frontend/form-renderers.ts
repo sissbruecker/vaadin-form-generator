@@ -1,9 +1,5 @@
 import { html, TemplateResult } from "lit";
-import {
-  html as staticHtml,
-  literal,
-  StaticValue,
-} from "lit/static-html.js";
+import { html as staticHtml, literal, StaticValue } from "lit/static-html.js";
 import FieldGroup from "Frontend/generated/de/sissbruecker/formbuilder/model/FieldGroup";
 import FormModel from "Frontend/generated/de/sissbruecker/formbuilder/model/FormModel";
 import FormField from "Frontend/generated/de/sissbruecker/formbuilder/model/FormField";
@@ -49,8 +45,8 @@ abstract class FormRenderer<TItemPresentation> {
         formItems.push(this.renderField(field!));
       });
 
-      if (spanTotal % 2 !== 0 && lastField && lastField.colSpan === 1) {
-        // add placeholder to fill row
+      // add placeholder to fill row
+      if (!options.addGroupHeader && spanTotal % 2 !== 0 && lastField && lastField.colSpan === 1) {
         formItems.push(this.renderPlaceholder());
       }
     });
@@ -127,5 +123,75 @@ export class LitTemplateFormRenderer extends FormRenderer<TemplateResult> {
 
   renderPlaceholder(): TemplateResult {
     return html` <div></div>`;
+  }
+}
+
+export class FlowFormRenderer extends FormRenderer<string> {
+  renderForm(formModel: FormModel, options: RenderOptions): string {
+    const formItems = this.renderFormItems(formModel, options);
+
+    return `FormLayout formLayout = new FormLayout();
+formLayout.setResponsiveSteps(
+  new FormLayout.ResponsiveStep("0", 1),
+  new FormLayout.ResponsiveStep("500px", 2)
+);
+
+${formItems.join("\n\n")}
+`;
+  }
+
+  renderField(field: FormField): string {
+    const effectiveFieldType =
+      field.fieldType || field.suggestedFieldType || FieldType.TextField;
+    let fieldType: string;
+
+    switch (effectiveFieldType) {
+      case FieldType.TextArea:
+        fieldType = "TextArea";
+        break;
+      case FieldType.EmailField:
+        fieldType = "EmailField";
+        break;
+      case FieldType.IntegerField:
+        fieldType = "IntegerField";
+        break;
+      case FieldType.NumberField:
+        fieldType = "NumberField";
+        break;
+      case FieldType.PasswordField:
+        fieldType = "PasswordField";
+        break;
+      case FieldType.DatePicker:
+        fieldType = "DatePicker";
+        break;
+      case FieldType.TimePicker:
+        fieldType = "TimePicker";
+        break;
+      case FieldType.DateTimePicker:
+        fieldType = "DateTimePicker";
+        break;
+      case FieldType.Checkbox:
+        fieldType = "Checkbox";
+        break;
+      case FieldType.Select:
+        fieldType = "Select";
+        break;
+      case FieldType.ComboBox:
+        fieldType = "ComboBox";
+        break;
+      default:
+        fieldType = "TextField";
+    }
+
+    return `${fieldType} ${field.beanProperty.name} = new ${fieldType}("${field.displayName}");
+formLayout.add(${field.beanProperty.name}, ${field.colSpan});`;
+  }
+
+  renderGroupHeader(group: FieldGroup): string {
+    return `formLayout.add(new H3("${group.name}"), 2);`;
+  }
+
+  renderPlaceholder(): string {
+    return "formLayout.add(new Div()); // placeholder to fill row";
   }
 }
