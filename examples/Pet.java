@@ -1,38 +1,26 @@
 public class Pet {
+    private String ownerName;
     private String name;
     private String species;
-    private String breed;
+    private String microchipId;
     private int age;
-    private String gender;
     private String color;
     private boolean isNeutered;
-    private boolean isVaccinated;
-    private String microchipId;
-    private String ownerName;
     private String ownerPhoneNumber;
+    private String gender;
     private String vetName;
+    private boolean isVaccinated;
     private String vetPhoneNumber;
+    private String breed;
 
-    // Constructor
-    public Pet(String name, String species, String breed, int age, String gender, String color,
-               boolean isNeutered, boolean isVaccinated, String microchipId, String ownerName,
-               String ownerPhoneNumber, String vetName, String vetPhoneNumber) {
-        this.name = name;
-        this.species = species;
-        this.breed = breed;
-        this.age = age;
-        this.gender = gender;
-        this.color = color;
-        this.isNeutered = isNeutered;
-        this.isVaccinated = isVaccinated;
-        this.microchipId = microchipId;
-        this.ownerName = ownerName;
-        this.ownerPhoneNumber = ownerPhoneNumber;
-        this.vetName = vetName;
-        this.vetPhoneNumber = vetPhoneNumber;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    // Getters and setters for all fields
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
     public String getName() {
         return name;
     }
@@ -49,12 +37,12 @@ public class Pet {
         this.species = species;
     }
 
-    public String getBreed() {
-        return breed;
+    public String getMicrochipId() {
+        return microchipId;
     }
 
-    public void setBreed(String breed) {
-        this.breed = breed;
+    public void setMicrochipId(String microchipId) {
+        this.microchipId = microchipId;
     }
 
     public int getAge() {
@@ -63,14 +51,6 @@ public class Pet {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public String getColor() {
@@ -89,36 +69,20 @@ public class Pet {
         isNeutered = neutered;
     }
 
-    public boolean isVaccinated() {
-        return isVaccinated;
-    }
-
-    public void setVaccinated(boolean vaccinated) {
-        isVaccinated = vaccinated;
-    }
-
-    public String getMicrochipId() {
-        return microchipId;
-    }
-
-    public void setMicrochipId(String microchipId) {
-        this.microchipId = microchipId;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
     public String getOwnerPhoneNumber() {
         return ownerPhoneNumber;
     }
 
     public void setOwnerPhoneNumber(String ownerPhoneNumber) {
         this.ownerPhoneNumber = ownerPhoneNumber;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getVetName() {
@@ -129,11 +93,27 @@ public class Pet {
         this.vetName = vetName;
     }
 
+    public boolean isVaccinated() {
+        return isVaccinated;
+    }
+
+    public void setVaccinated(boolean vaccinated) {
+        isVaccinated = vaccinated;
+    }
+
     public String getVetPhoneNumber() {
         return vetPhoneNumber;
     }
 
     public void setVetPhoneNumber(String vetPhoneNumber) {
         this.vetPhoneNumber = vetPhoneNumber;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
     }
 }

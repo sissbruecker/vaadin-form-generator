@@ -15,11 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -35,79 +35,46 @@ public class FormGenerator {
     public FormModel generateForm(BeanModel beanModel, FormGeneratorConfig config) {
         FormModel formModel = new FormModel(beanModel);
 
-        suggestFieldNames(formModel, config);
-        suggestPurpose(formModel);
-        suggestFieldOrder(formModel);
-        // suggestFieldLength(formModel);
         determineFieldSpans(formModel);
-        suggestFieldSpans(formModel);
         determineFieldTypes(formModel);
-        suggestFieldTypes(formModel);
-        suggestFieldGroups(formModel, config);
+
+        getSuggestions(formModel, config);
 
         return formModel;
     }
 
-    private void suggestFieldNames(FormModel formModel, FormGeneratorConfig config) {
+    private void getSuggestions(FormModel formModel, FormGeneratorConfig config) {
         StringBuilder prompt = new StringBuilder()
-                .append(String.format("I have a list of properties from a Java class named `%s`. ", formModel.getBeanModel().getClassName()))
-                .append("I want to create a form for it, with one field for each property. ")
-                .append("Please suggest human readable field labels for the following properties, which include the property name and its Java type:\n");
+                .append(String.format("I have a list of properties from a Java class named `%s`: ", formModel.getBeanModel().getClassName()));
+
         formModel.getFields().forEach(field -> prompt.append("- ").append(field.getPropertyName()).append(" (`").append(field.getPropertyType()).append("`)\n"));
-        if (config.getLanguage() != null) {
-            prompt.append(String.format("The labels should be in %s. ", config.getLanguage()));
-        }
-        prompt
-                .append("The labels should be short and descriptive. ")
-                .append("Return the labels as comma-separated values, all in one line. ")
-                .append("Do not include the provided property names or Java types in the output. ");
-        logger.debug("suggestFieldNames prompt:\n{}", prompt);
+
+        prompt.append("I want to create a form for it, with one field for each property. ")
+                .append("I want you to do the following:\n")
+                .append("1. Describe the purpose of the form in a single paragraph\n")
+                .append(String.format("2. Suggest a human readable label for the form fields. The labels should be in %s.\n", config.getLanguage()))
+                .append("3. Suggest a good order for the form fields\n")
+                .append("4. Suggest how many characters a user would typically have to enter into each field\n")
+                .append("5. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses\n")
+                .append("6. Suggest which fields can be logically grouped together into form groups.\n")
+                .append("\n")
+                .append("Return your output in the following format:\n")
+                .append("\n")
+                .append("Purpose: <suggested purpose>\n")
+                .append("\n")
+                .append("Fields <one per line, in the suggested order>:\n")
+                .append("- <Java propery name> | <suggested label> | <suggested number of characters, digits only> | <suggested UI control>\n")
+                .append("- ...\n")
+                .append("\n")
+                .append("Groups:\n")
+                .append("- Group name: <Java property name 1>, <Java property name 2>, ...\n")
+                .append("- ...");
+
+        logger.debug("suggestions prompt:\n{}", prompt);
 
         String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldNames reply:\n{}", reply);
-
-        List<String> suggestedFieldNames = extractFieldList(reply, formModel.getFields().size());
-        IntStream.range(0, suggestedFieldNames.size()).forEach(i -> formModel.getFields().get(i).setDisplayName(suggestedFieldNames.get(i)));
-    }
-
-    private void suggestPurpose(FormModel formModel) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel))
-                .append(String.format("We also know that the form has been created from a Java class named `%s`. ", formModel.getBeanModel().getClassName()))
-                .append("What would you say is the purpose of this form? Provide a short description, do not mention the individual fields.");
-        logger.debug("suggestPurpose prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestPurpose reply:\n{}", reply);
-
-        formModel.setPurpose(reply);
-    }
-
-    private void suggestFieldOrder(FormModel formModel) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel))
-                .append(explainPurpose(formModel))
-                .append("Please suggest a good order for the fields. ")
-                .append("Only return the fields in their new order, as comma-separated values, all in one line. ");
-        logger.debug("suggestFieldOrder prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldOrder reply:\n{}", reply);
-
-        List<String> fieldList = extractFieldList(reply, formModel.getFields().size());
-        formModel.getFields().forEach(field -> field.setOrder(fieldList.indexOf(field.getDisplayName())));
-    }
-
-    private void suggestFieldLength(FormModel formModel) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel))
-                .append(explainPurpose(formModel))
-                .append("Please suggest how many characters a user would typically need to enter in each of the fields. ")
-                .append("Return the result as CSV, with the field name in the first column, and the maximum number of characters in the second column.");
-        logger.debug("suggestedFieldLengths prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestedFieldLengths reply:\n{}", reply);
+        logger.debug("suggestions reply:\n{}", reply);
+        parseReply(reply, formModel);
     }
 
     private void determineFieldSpans(FormModel formModel) {
@@ -134,31 +101,6 @@ public class FormGenerator {
         formModel.getFields().stream()
                 .filter(field -> simpleTypes.contains(field.getPropertyType()))
                 .forEach(field -> field.setColSpan(1));
-    }
-
-    private void suggestFieldSpans(FormModel formModel) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel))
-                .append(explainPurpose(formModel))
-                .append("The form visually consists of two columns. ")
-                .append("Fields that typically require entering only a few characters should only span one column. ")
-                .append("Fields that might require entering more characters should span two columns. ")
-                .append("Based on the field names, please suggest how many columns each field should span. ")
-                .append("Only return the column span as digits, one for each field in the same order as the provided fields, as comma-separated values, all in one line. ");
-        logger.debug("suggestFieldSpans prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldSpans reply:\n{}", reply);
-
-        List<String> suggestedColSpans = extractFieldList(reply, formModel.getFields().size());
-        List<FormField> orderedFields = formModel.getOrderedFields();
-        IntStream.range(0, suggestedColSpans.size()).forEach(i -> {
-            // Only use suggestion if field does not have deterministic span already
-            FormField formField = orderedFields.get(i);
-            if (formField.getColSpan() == 0) {
-                formField.setColSpan(Integer.parseInt(suggestedColSpans.get(i)));
-            }
-        });
     }
 
     private void determineFieldTypes(FormModel formModel) {
@@ -189,87 +131,6 @@ public class FormGenerator {
         });
     }
 
-    private void suggestFieldTypes(FormModel formModel) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel, true))
-                .append(explainPurpose(formModel))
-                .append("Please suggest a good UI control for each field. ")
-                .append("The following types of UI controls are available:\n")
-                .append("- TextField (for short text)\n")
-                .append("- TextArea (for longer text)\n")
-                .append("- EmailField (for email addresses)\n")
-                .append("- IntegerField (for integers)\n")
-                .append("- NumberField (for decimal numbers)\n")
-                .append("- PasswordField (for passwords)\n")
-                .append("- DatePicker (for dates)\n")
-                .append("- TimePicker (for times)\n")
-                .append("- DateTimePicker (for date and time)\n")
-                .append("- Checkbox (for booleans)\n")
-                .append("- Select (for selecting from a list of values)\n")
-                .append("- ComboBox (for selecting from a list of values and entering custom values)\n")
-                .append("\n")
-                .append("Only return the exact name of the UI control, one for each field, in the same order as the provided fields, as comma-separated values, all in one line. ");
-        logger.debug("suggestFieldTypes prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldTypes reply:\n{}", reply);
-
-        List<String> fieldList = extractFieldList(reply, formModel.getFields().size());
-        List<FormField> orderedFields = formModel.getOrderedFields();
-        IntStream.range(0, orderedFields.size()).forEach(i -> {
-            // Only use suggestion if field does not have deterministic type already
-            FormField formField = orderedFields.get(i);
-            if (formField.getFieldType() != null) {
-                return;
-            }
-
-            String fieldTypeName = fieldList.get(i);
-            FieldType fieldType;
-            try {
-                fieldType = FieldType.valueOf(fieldTypeName);
-            } catch (IllegalArgumentException e) {
-                fieldType = FieldType.TextField;
-            }
-            formField.setSuggestedFieldType(fieldType);
-        });
-    }
-
-    private void suggestFieldGroups(FormModel formModel, FormGeneratorConfig config) {
-        StringBuilder prompt = new StringBuilder()
-                .append(explainFormFields(formModel))
-                .append(explainPurpose(formModel))
-                .append("Please suggest which fields can be logically grouped together, and also suggest a name for each group. ")
-                .append(String.format("The group name should be in %s. ", config.getLanguage()))
-                .append("Try to keep the number of groups low. ")
-                .append("Return one group per line. ")
-                .append("Each line should contain the group name, followed by the fields in that group, all separated by comma. For example:\n")
-                .append("First group name, Some field, Another field\n")
-                .append("Second group name, Some field, Another field\n")
-                .append("...\n");
-        logger.debug("suggestFieldGroups prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString());
-        logger.debug("suggestFieldGroups reply:\n{}", reply);
-
-        List<String> groupList = reply.lines().toList();
-        List<FieldGroup> groups = groupList.stream().map(group -> {
-            String[] groupParts = group.split(",");
-            String groupName = groupParts[0].trim();
-            List<String> fieldNames = Arrays.stream(groupParts).skip(1).map(String::trim).toList();
-            FieldGroup fieldGroup = new FieldGroup();
-            fieldGroup.setName(groupName);
-            fieldGroup.setProperties(
-                    formModel.getOrderedFields().stream()
-                            .filter(field -> fieldNames.contains(field.getDisplayName()))
-                            .map(FormField::getPropertyName)
-                            .collect(Collectors.toList())
-            );
-            return fieldGroup;
-        }).toList();
-
-        formModel.setGroups(groups);
-    }
-
     private String makeRequest(String prompt) {
         ChatCompletionRequest request = new ChatCompletionRequest();
         request.setModel("gpt-3.5-turbo");
@@ -289,41 +150,103 @@ public class FormGenerator {
         return message;
     }
 
-    private String explainFormFields(FormModel formModel) {
-        return explainFormFields(formModel, false);
-    }
+    private void parseReply(String reply, FormModel formModel) {
+        Map<String, String> sections = parseSections(reply);
 
-    private String explainFormFields(FormModel formModel, boolean explainJavaTypes) {
-        StringBuilder prompt = new StringBuilder()
-                .append(String.format("A `%s` form has the following fields:\n", formModel.getBeanModel().getClassName()));
-        formModel.getOrderedFields().forEach(field -> {
-            prompt.append("- ").append(field.getDisplayName());
-            if (explainJavaTypes) {
-                prompt.append(" (`").append(field.getPropertyType()).append("`)");
+        if (!sections.containsKey("Purpose")) {
+            throw new IllegalStateException("Failed to parse purpose from reply");
+        }
+        if (!sections.containsKey("Fields")) {
+            throw new IllegalStateException("Failed to parse fields from reply");
+        }
+        if (!sections.containsKey("Groups")) {
+            throw new IllegalStateException("Failed to parse form groups from reply");
+        }
+
+        // Extract purpose
+        formModel.setPurpose(sections.get("Purpose"));
+
+        // Extract fields
+        List<String> fields = extractListItems(sections.get("Fields"));
+
+        IntStream.range(0, fields.size()).forEach(index -> {
+            String fieldData = fields.get(index);
+            String[] fieldValues = fieldData.split("\\|");
+            String propertyName = fieldValues[0].trim();
+            String suggestedLabel = fieldValues[1].trim();
+            int suggestedCharacters = Integer.parseInt(fieldValues[2].trim());
+            String suggestedFieldType = fieldValues[3].trim();
+
+            FormField field = formModel.findFieldByProperty(propertyName);
+            if (field == null) {
+                throw new IllegalStateException("Could not find field with property name " + propertyName);
             }
-            prompt.append("\n");
+            field.setOrder(index);
+            field.setDisplayName(suggestedLabel);
+            // Only use suggested colspan if we don't have a deterministic one
+            if (field.getColSpan() == 0) {
+                field.setColSpan(suggestedCharacters >= 50 ? 2 : 1);
+            }
+            // Only use suggested field type if we don't have a deterministic one
+            if (field.getFieldType() == null) {
+                field.setFieldType(FieldType.valueOf(suggestedFieldType));
+            }
         });
 
-        return prompt.toString();
+        // Extract form groups
+        List<String> formGroups = extractListItems(sections.get("Groups"));
+        formGroups.forEach(groupData -> {
+            String[] groupValues = groupData.split(":");
+            String groupName = groupValues[0].trim();
+            String[] groupProperties = groupValues[1].split(",");
+
+            FieldGroup group = new FieldGroup();
+            group.setName(groupName);
+            for (String sectionField : groupProperties) {
+                String propertyName = sectionField.trim();
+                group.getProperties().add(propertyName);
+            }
+
+            formModel.getGroups().add(group);
+        });
     }
 
-    private String explainPurpose(FormModel formModel) {
-        if (formModel.getPurpose() == null || formModel.getPurpose().isBlank()) {
-            return "";
+    private Map<String, String> parseSections(String reply) {
+        Map<String, String> sections = new HashMap<>();
+        String[] lines = reply.split("\n");
+
+        String currentSection = null;
+        StringBuilder currentSectionLines = new StringBuilder();
+
+        for (String line : lines) {
+            // detect new section
+            Pattern sectionStartPattern = Pattern.compile("^([\\w-]+):");
+            Matcher sectionStartMatcher = sectionStartPattern.matcher(line);
+            if (sectionStartMatcher.find()) {
+                // close previous section
+                if (currentSection != null && currentSectionLines.length() > 0) {
+                    sections.put(currentSection, currentSectionLines.toString().trim());
+                }
+                // start new section
+                currentSection = sectionStartMatcher.group(1);
+                currentSectionLines = new StringBuilder();
+                // remove section header from line
+                line = line.replace(sectionStartMatcher.group(), "");
+            }
+            // add line to section
+            currentSectionLines.append(line).append("\n");
         }
 
-        return formModel.getPurpose() + "\n";
-    }
-
-    private String stripNonAlphaNumeric(String input) {
-        return input.replaceAll("[^a-zA-Z0-9\\s]", "");
-    }
-
-    private List<String> extractFieldList(String reply, int expectedSize) {
-        String[] fieldList = reply.split(",");
-        if (expectedSize > 0 && fieldList.length != expectedSize) {
-            throw new IllegalStateException("Number of returned items does not match expected list size");
+        // close final section
+        if (currentSection != null && currentSectionLines.length() > 0) {
+            sections.put(currentSection, currentSectionLines.toString().trim());
         }
-        return Stream.of(fieldList).map(String::trim).toList();
+
+        return sections;
+    }
+
+    private List<String> extractListItems(String section) {
+        String[] fieldList = section.split("\n");
+        return Stream.of(fieldList).map(field -> field.replaceAll("^- ", "")).toList();
     }
 }

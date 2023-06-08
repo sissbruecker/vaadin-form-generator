@@ -44,7 +44,6 @@ export class GeneratorView extends LitElement {
     return css`
       :host {
         display: block;
-        max-width: 1280px;
         height: 100%;
         margin-left: auto;
         margin-right: auto;
@@ -86,6 +85,7 @@ export class GeneratorView extends LitElement {
   private formConfig: FormGeneratorConfig | null = null;
   @state()
   private formModel: FormModel | null = null;
+  @state()
   private flowFormCode: string = "";
 
   get exampleBeanOptions(): ExampleBeanOption[] {

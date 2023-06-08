@@ -1,23 +1,22 @@
 public class Employee {
-    // Properties
-    private int employeeId;
+    private String jobTitle;
     private String firstName;
     private String lastName;
-    private String email;
-    private String phoneNumber;
-    private String jobTitle;
     private String department;
+    private int employeeId;
     private double salary;
+    private String email;
     private Person manager;
     private Date hireDate;
     private boolean isActive;
+    private String phoneNumber;
 
-    public int getEmployeeId() {
-        return employeeId;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public void setEmployeeId(int employeeId) {
-        this.employeeId = employeeId;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public String getFirstName() {
@@ -36,30 +35,6 @@ public class Employee {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
     public String getDepartment() {
         return department;
     }
@@ -68,12 +43,28 @@ public class Employee {
         this.department = department;
     }
 
+    public int getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
+
     public double getSalary() {
         return salary;
     }
 
     public void setSalary(double salary) {
         this.salary = salary;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Person getManager() {
@@ -98,5 +89,13 @@ public class Employee {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

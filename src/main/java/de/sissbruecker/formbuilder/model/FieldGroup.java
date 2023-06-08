@@ -2,13 +2,14 @@ package de.sissbruecker.formbuilder.model;
 
 import dev.hilla.Nonnull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FieldGroup {
     @Nonnull
     private String name;
     @Nonnull
-    private List<@Nonnull String> properties;
+    private List<@Nonnull String> properties = new ArrayList<>();
 
     public String getName() {
         return name;

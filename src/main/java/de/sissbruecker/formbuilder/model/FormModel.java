@@ -63,4 +63,8 @@ public class FormModel {
     public void setGroups(List<FieldGroup> groups) {
         this.groups = groups;
     }
+
+    public FormField findFieldByProperty(String propertyName) {
+        return fields.stream().filter(f -> f.getBeanProperty().getName().equals(propertyName)).findFirst().orElse(null);
+    }
 }

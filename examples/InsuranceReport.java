@@ -1,22 +1,30 @@
 public class InsuranceReport {
-    private int policyNumber;
-    private String insuredDriverName;
-    private String insuredDriverLicenseNumber;
-    private LocalDateTime accidentDateTime;
-    private String accidentLocation;
-    private String otherDriverName;
-    private String otherDriverLicenseNumber;
+    private String policeReportNumber;
     private String otherDriverInsuranceCompany;
+    private String insuredDriverName;
+    private LocalDateTime accidentDateTime;
+    private String otherDriverLicenseNumber;
+    private int policyNumber;
     private String otherDriverInsurancePolicyNumber;
     private String descriptionOfDamage;
-    private String policeReportNumber;
+    private String accidentLocation;
+    private String otherDriverName;
+    private String insuredDriverLicenseNumber;
 
-    public int getPolicyNumber() {
-        return policyNumber;
+    public String getPoliceReportNumber() {
+        return policeReportNumber;
     }
 
-    public void setPolicyNumber(int policyNumber) {
-        this.policyNumber = policyNumber;
+    public void setPoliceReportNumber(String policeReportNumber) {
+        this.policeReportNumber = policeReportNumber;
+    }
+
+    public String getOtherDriverInsuranceCompany() {
+        return otherDriverInsuranceCompany;
+    }
+
+    public void setOtherDriverInsuranceCompany(String otherDriverInsuranceCompany) {
+        this.otherDriverInsuranceCompany = otherDriverInsuranceCompany;
     }
 
     public String getInsuredDriverName() {
@@ -27,36 +35,12 @@ public class InsuranceReport {
         this.insuredDriverName = insuredDriverName;
     }
 
-    public String getInsuredDriverLicenseNumber() {
-        return insuredDriverLicenseNumber;
-    }
-
-    public void setInsuredDriverLicenseNumber(String insuredDriverLicenseNumber) {
-        this.insuredDriverLicenseNumber = insuredDriverLicenseNumber;
-    }
-
     public LocalDateTime getAccidentDateTime() {
         return accidentDateTime;
     }
 
     public void setAccidentDateTime(LocalDateTime accidentDateTime) {
         this.accidentDateTime = accidentDateTime;
-    }
-
-    public String getAccidentLocation() {
-        return accidentLocation;
-    }
-
-    public void setAccidentLocation(String accidentLocation) {
-        this.accidentLocation = accidentLocation;
-    }
-
-    public String getOtherDriverName() {
-        return otherDriverName;
-    }
-
-    public void setOtherDriverName(String otherDriverName) {
-        this.otherDriverName = otherDriverName;
     }
 
     public String getOtherDriverLicenseNumber() {
@@ -67,12 +51,12 @@ public class InsuranceReport {
         this.otherDriverLicenseNumber = otherDriverLicenseNumber;
     }
 
-    public String getOtherDriverInsuranceCompany() {
-        return otherDriverInsuranceCompany;
+    public int getPolicyNumber() {
+        return policyNumber;
     }
 
-    public void setOtherDriverInsuranceCompany(String otherDriverInsuranceCompany) {
-        this.otherDriverInsuranceCompany = otherDriverInsuranceCompany;
+    public void setPolicyNumber(int policyNumber) {
+        this.policyNumber = policyNumber;
     }
 
     public String getOtherDriverInsurancePolicyNumber() {
@@ -91,11 +75,27 @@ public class InsuranceReport {
         this.descriptionOfDamage = descriptionOfDamage;
     }
 
-    public String getPoliceReportNumber() {
-        return policeReportNumber;
+    public String getAccidentLocation() {
+        return accidentLocation;
     }
 
-    public void setPoliceReportNumber(String policeReportNumber) {
-        this.policeReportNumber = policeReportNumber;
+    public void setAccidentLocation(String accidentLocation) {
+        this.accidentLocation = accidentLocation;
+    }
+
+    public String getOtherDriverName() {
+        return otherDriverName;
+    }
+
+    public void setOtherDriverName(String otherDriverName) {
+        this.otherDriverName = otherDriverName;
+    }
+
+    public String getInsuredDriverLicenseNumber() {
+        return insuredDriverLicenseNumber;
+    }
+
+    public void setInsuredDriverLicenseNumber(String insuredDriverLicenseNumber) {
+        this.insuredDriverLicenseNumber = insuredDriverLicenseNumber;
     }
 }
