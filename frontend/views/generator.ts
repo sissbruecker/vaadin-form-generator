@@ -28,6 +28,7 @@ import FormGeneratorConfig from "Frontend/generated/de/sissbruecker/formbuilder/
 import { CheckboxCheckedChangedEvent } from "@vaadin/checkbox";
 import {
   FlowFormRenderer,
+  HillaLitFormRenderer,
   LitTemplateFormRenderer,
 } from "Frontend/form-renderers";
 import "./code-view";
@@ -87,6 +88,8 @@ export class GeneratorView extends LitElement {
   private formModel: FormModel | null = null;
   @state()
   private flowFormCode: string = "";
+  @state()
+  private hillaLitFormCode: string = "";
 
   get exampleBeanOptions(): ExampleBeanOption[] {
     return this.exampleBeans.map((bean) => ({
@@ -111,8 +114,11 @@ export class GeneratorView extends LitElement {
       changedProperties.has("formModel")
     ) {
       if (this.formConfig && this.formModel) {
-        const renderer = new FlowFormRenderer();
-        this.flowFormCode = renderer.renderForm(
+        this.flowFormCode = new FlowFormRenderer().renderForm(
+          this.formModel,
+          this.formConfig
+        );
+        this.hillaLitFormCode = new HillaLitFormRenderer().renderForm(
           this.formModel,
           this.formConfig
         );
@@ -183,11 +189,17 @@ export class GeneratorView extends LitElement {
             <vaadin-tabs slot="tabs">
               <vaadin-tab id="preview-tab">Preview</vaadin-tab>
               <vaadin-tab id="flow-code-tab">Source code (Flow)</vaadin-tab>
+              <vaadin-tab id="hilla-lit-code-tab"
+                >Source code (Hilla / Lit)</vaadin-tab
+              >
             </vaadin-tabs>
 
             <div tab="preview-tab">${this.renderPreview()}</div>
             <div tab="flow-code-tab">
-              <form-code-view .code="${this.flowFormCode}"></form-code-view>
+              <form-code-view .code="${this.flowFormCode}" .language="java"></form-code-view>
+            </div>
+            <div tab="hilla-lit-code-tab">
+              <form-code-view .code="${this.hillaLitFormCode}" .language="html"></form-code-view>
             </div>
           </vaadin-tabsheet>
         </div>

@@ -46,7 +46,12 @@ abstract class FormRenderer<TItemPresentation> {
       });
 
       // add placeholder to fill row
-      if (!options.addGroupHeader && spanTotal % 2 !== 0 && lastField && lastField.colSpan === 1) {
+      if (
+        !options.addGroupHeader &&
+        spanTotal % 2 !== 0 &&
+        lastField &&
+        lastField.colSpan === 1
+      ) {
         formItems.push(this.renderPlaceholder());
       }
     });
@@ -193,5 +198,67 @@ formLayout.add(${field.beanProperty.name}, ${field.colSpan});`;
 
   renderPlaceholder(): string {
     return "formLayout.add(new Div()); // placeholder to fill row";
+  }
+}
+
+export class HillaLitFormRenderer extends FormRenderer<string> {
+  renderForm(formModel: FormModel, options: RenderOptions): string {
+    const formItems = this.renderFormItems(formModel, options);
+
+    return `<vaadin-form-layout>
+${formItems.join("\n\n")}
+</vaadin-form-layout>`;
+  }
+
+  renderField(field: FormField): string {
+    let elementName: string;
+
+    switch (field.fieldType) {
+      case FieldType.TextArea:
+        elementName = "vaadin-text-area";
+        break;
+      case FieldType.EmailField:
+        elementName = "vaadin-email-field";
+        break;
+      case FieldType.IntegerField:
+        elementName = "vaadin-integer-field";
+        break;
+      case FieldType.NumberField:
+        elementName = "vaadin-number-field";
+        break;
+      case FieldType.PasswordField:
+        elementName = "vaadin-password-field";
+        break;
+      case FieldType.DatePicker:
+        elementName = "vaadin-date-picker";
+        break;
+      case FieldType.TimePicker:
+        elementName = "vaadin-time-picker";
+        break;
+      case FieldType.DateTimePicker:
+        elementName = "vaadin-date-time-picker";
+        break;
+      case FieldType.Checkbox:
+        elementName = "vaadin-checkbox";
+        break;
+      case FieldType.Select:
+        elementName = "vaadin-select";
+        break;
+      case FieldType.ComboBox:
+        elementName = "vaadin-combo-box";
+        break;
+      default:
+        elementName = "vaadin-text-field";
+    }
+
+    return `  <${elementName} label="${field.displayName}" colspan="${field.colSpan}"></${elementName}>`
+  }
+
+  renderGroupHeader(group: FieldGroup): string {
+    return `  <h3 colspan="2">${group.name}</h3>`
+  }
+
+  renderPlaceholder(): string {
+    return `  <div></div> <!-- placeholder to fill row -->`;
   }
 }
