@@ -55,7 +55,7 @@ public class FormGenerator {
                 .append(String.format("2. Suggest a human readable label for the form fields. The labels should be in %s.\n", config.getLanguage()))
                 .append("3. Suggest a good order for the form fields\n")
                 .append("4. Suggest how many characters a user would typically have to enter into each field\n")
-                .append("5. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses\n")
+                .append("5. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses, and `PasswordField` for passwords.\n")
                 .append("6. Suggest which fields can be logically grouped together into form groups.\n")
                 .append("\n")
                 .append("Return your output in the following format:\n")
@@ -63,12 +63,31 @@ public class FormGenerator {
                 .append("Purpose: <suggested purpose>\n")
                 .append("\n")
                 .append("Fields <one per line, in the suggested order>:\n")
-                .append("- <Java propery name> | <suggested label> | <suggested number of characters, digits only> | <suggested UI control>\n")
+                .append("- <Java property name> | <suggested label> | <suggested number of characters, digits only> | <suggested UI control>\n")
                 .append("- ...\n")
                 .append("\n")
                 .append("Groups:\n")
-                .append("- Group name: <Java property name 1>, <Java property name 2>, ...\n")
+                .append("- <suggested group name>: <Java property name 1>, <Java property name 2>, ...\n")
                 .append("- ...");
+
+        prompt.append("\n\n")
+                .append("---")
+                .append("\n\n");
+
+        prompt.append("The following is an example output:")
+                .append("\n\n")
+                .append("Purpose: Create a new user account\n")
+                .append("\n\n")
+                .append("Fields:\n")
+                .append("- firstName | First name | 20 | TextField\n")
+                .append("- lastName | Last name | 20 | TextField\n")
+                .append("- email | Email address | 50 | EmailField\n")
+                .append("- password | Password | 20 | PasswordField\n")
+                .append("\n")
+                .append("Groups:\n")
+                .append("- Personal information: firstName, lastName\n")
+                .append("- Account information: email, password");
+
 
         logger.debug("suggestions prompt:\n{}", prompt);
 
@@ -174,7 +193,7 @@ public class FormGenerator {
             String[] fieldValues = fieldData.split("\\|");
             String propertyName = fieldValues[0].trim();
             String suggestedLabel = fieldValues[1].trim();
-            int suggestedCharacters = Integer.parseInt(fieldValues[2].trim());
+            int suggestedCharacters = parseSuggestedFieldLength(fieldValues[2].trim());
             String suggestedFieldType = fieldValues[3].trim();
 
             FormField field = formModel.findFieldByProperty(propertyName);
@@ -248,5 +267,16 @@ public class FormGenerator {
     private List<String> extractListItems(String section) {
         String[] fieldList = section.split("\n");
         return Stream.of(fieldList).map(field -> field.replaceAll("^- ", "")).toList();
+    }
+
+    private int parseSuggestedFieldLength(String suggestedFieldLength) {
+        // Extract digits using regex
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(suggestedFieldLength);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group());
+        } else {
+            throw new IllegalStateException("Failed to parse suggested field length");
+        }
     }
 }
