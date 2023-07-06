@@ -105,7 +105,7 @@ public class FormGenerator {
 
         logger.debug("suggestions prompt:\n{}", prompt);
 
-        String reply = makeRequest(prompt.toString());
+        String reply = makeRequest(prompt.toString(), config.getTemperature());
         logger.debug("suggestions reply:\n{}", reply);
         parseReply(reply, formModel);
     }
@@ -164,10 +164,10 @@ public class FormGenerator {
         });
     }
 
-    private String makeRequest(String prompt) {
+    private String makeRequest(String prompt, double temperature) {
         ChatCompletionRequest request = new ChatCompletionRequest();
         request.setModel("gpt-3.5-turbo");
-        request.setTemperature(0.0);
+        request.setTemperature(temperature);
         request.setMessages(List.of(createMessage("user", prompt)));
 
         ChatCompletionResult result = openAiService.createChatCompletion(request);

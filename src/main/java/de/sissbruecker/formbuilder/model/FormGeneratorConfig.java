@@ -8,6 +8,8 @@ public class FormGeneratorConfig {
     @Nonnull
     private String language = "English";
     @Nonnull
+    private double temperature = 0;
+    @Nonnull
     private boolean addGroupHeader = true;
 
     public String getBeanSourceCode() {
@@ -24,6 +26,14 @@ public class FormGeneratorConfig {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public double getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
     }
 
     public boolean isAddGroupHeader() {

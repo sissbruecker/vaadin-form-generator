@@ -43,6 +43,11 @@ export class GeneratorView extends LitElement {
         font-size: var(--lumo-font-size-xl);
       }
 
+      h2 {
+        margin: var(--lumo-space-s) 0;
+        font-size: var(--lumo-font-size-m);
+      }
+
       vaadin-upload {
         display: inline-block;
       }
@@ -74,6 +79,65 @@ export class GeneratorView extends LitElement {
 
       .output vaadin-scroller {
         width: 100%;
+      }
+
+      /* Set the track and thumb color */
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        outline: none;
+      }
+
+      /* Style the track */
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 8px;
+        background-color: var(--lumo-primary-color);
+        border-radius: 4px;
+      }
+
+      input[type="range"]::-moz-range-track {
+        width: 100%;
+        height: 8px;
+        background-color: var(--lumo-primary-color);
+        border-radius: 4px;
+      }
+
+      /* Style the thumb */
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        background-color: var(--lumo-base-color);
+        border-radius: 50%;
+        border: 2px solid var(--lumo-contrast);
+        margin-top: -4px;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background-color: var(--lumo-base-color);
+        border-radius: 50%;
+        border: 2px solid var(--lumo-contrast);
+        margin-top: -4px;
+      }
+
+      /* Style the thumb on hover */
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        background-color: var(--lumo-base-color);
+        cursor: pointer;
+      }
+
+      input[type="range"]::-moz-range-thumb:hover {
+        background-color: var(--lumo-base-color);
+        cursor: pointer;
       }
     `;
   }
@@ -117,6 +181,7 @@ export class GeneratorView extends LitElement {
       <div class="layout">
         <div class="configuration">
           <h1>Vaadin Form Generator</h1>
+          <h2>Generator Options</h2>
           <vaadin-select
             label="Load demo bean"
             .items="${this.exampleBeanOptions}"
@@ -141,18 +206,34 @@ export class GeneratorView extends LitElement {
               })}"
           ></vaadin-text-field>
           <br />
-          <vaadin-custom-field label="Options">
-            <vaadin-checkbox
-              label="Add group header"
-              ?checked="${this.formConfig.addGroupHeader}"
-              @checked-changed="${(e: CheckboxCheckedChangedEvent) =>
-                (this.formConfig = {
+          <vaadin-custom-field label="Turn up the heat (Temperature)">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              .value="${this.formConfig.temperature.toString()}"
+              @change="${(event: InputEvent) => {
+                this.formConfig = {
                   ...this.formConfig!,
-                  addGroupHeader: e.detail.value,
-                })}"
-            >
-            </vaadin-checkbox>
+                  temperature: parseFloat(
+                    (event.target as HTMLInputElement).value
+                  ),
+                };
+              }}"
+            />
           </vaadin-custom-field>
+          <h2>Rendering Options</h2>
+          <vaadin-checkbox
+            label="Show group header"
+            ?checked="${this.formConfig.addGroupHeader}"
+            @checked-changed="${(e: CheckboxCheckedChangedEvent) =>
+              (this.formConfig = {
+                ...this.formConfig!,
+                addGroupHeader: e.detail.value,
+              })}"
+          >
+          </vaadin-checkbox>
           <br />
           <br />
           <vaadin-button
