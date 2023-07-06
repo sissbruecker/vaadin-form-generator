@@ -35,8 +35,8 @@ public class FormGenerator {
     public FormModel generateForm(BeanModel beanModel, FormGeneratorConfig config) {
         FormModel formModel = new FormModel(beanModel);
 
-        determineFieldSpans(formModel);
-        determineFieldTypes(formModel);
+        applyDeterministicFieldSpans(formModel);
+        applyDeterministicFieldTypes(formModel);
 
         getSuggestions(formModel, config);
 
@@ -45,30 +45,38 @@ public class FormGenerator {
 
     private void getSuggestions(FormModel formModel, FormGeneratorConfig config) {
         StringBuilder prompt = new StringBuilder()
-                .append(String.format("I have a list of properties from a Java class named `%s`: ", formModel.getBeanModel().getClassName()));
+                .append(String.format("I have a list of properties from a Java class named `%s`:\n", formModel.getBeanModel().getClassName()));
 
         formModel.getFields().forEach(field -> prompt.append("- ").append(field.getPropertyName()).append(" (`").append(field.getPropertyType()).append("`)\n"));
 
+        prompt.append("\n");
         prompt.append("I want to create a form for it, with one field for each property. ")
                 .append("I want you to do the following:\n")
-                .append("1. Describe the purpose of the form in a single paragraph\n")
-                .append(String.format("2. Suggest a human readable label for the form fields. The labels should be in %s.\n", config.getLanguage()))
-                .append("3. Suggest a good order for the form fields\n")
-                .append("4. Suggest how many characters a user would typically have to enter into each field\n")
-                .append("5. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses, and `PasswordField` for passwords.\n")
-                .append("6. Suggest which fields can be logically grouped together into form groups.\n")
+                .append("1. Describe the purpose of the form, and where it might be used, in a single paragraph\n")
+                .append("2. Make suggestions for each form field:\n")
+                .append(String.format("  2a. Suggest a label for the field. The labels should be in %s.\n", config.getLanguage()))
+                .append("  2b. Suggest how many characters a user would typically have to enter into each field\n")
+                .append("  2c. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses, and `PasswordField` for passwords.\n")
+                .append("3. Suggest a good order of the fields, based on how users would typically would want to fill out the form.\n")
+                .append("4. Suggest which fields can be logically grouped together into form groups. Generate a label for each group, which should be in English.\n")
+                .append("\n")
+                .append("---")
                 .append("\n")
                 .append("Return your output in the following format:\n")
                 .append("\n")
                 .append("Purpose: <suggested purpose>\n")
                 .append("\n")
-                .append("Fields <one per line, in the suggested order>:\n")
+                .append("Fields:\n")
                 .append("- <Java property name> | <suggested label> | <suggested number of characters, digits only> | <suggested UI control>\n")
-                .append("- ...\n")
+                .append("...\n")
+                .append("\n")
+                .append("Suggested order of fields:\n")
+                .append("1. <Java property name>\n")
+                .append("...\n")
                 .append("\n")
                 .append("Groups:\n")
                 .append("- <suggested group name>: <Java property name 1>, <Java property name 2>, ...\n")
-                .append("- ...");
+                .append("...");
 
         prompt.append("\n\n")
                 .append("---")
@@ -76,13 +84,19 @@ public class FormGenerator {
 
         prompt.append("The following is an example output:")
                 .append("\n\n")
-                .append("Purpose: Create a new user account\n")
-                .append("\n\n")
+                .append("Purpose: The form is used to create new user accounts on websites. It can be used on various types of websites such as social media, e-commerce, and news websites.\n")
+                .append("\n")
                 .append("Fields:\n")
-                .append("- firstName | First name | 20 | TextField\n")
                 .append("- lastName | Last name | 20 | TextField\n")
-                .append("- email | Email address | 50 | EmailField\n")
+                .append("- firstName | First name | 20 | TextField\n")
                 .append("- password | Password | 20 | PasswordField\n")
+                .append("- email | Email address | 50 | EmailField\n")
+                .append("\n")
+                .append("Suggested order of fields:\n")
+                .append("1. firstName\n")
+                .append("2. lastName\n")
+                .append("3. email\n")
+                .append("4. password\n")
                 .append("\n")
                 .append("Groups:\n")
                 .append("- Personal information: firstName, lastName\n")
@@ -96,7 +110,7 @@ public class FormGenerator {
         parseReply(reply, formModel);
     }
 
-    private void determineFieldSpans(FormModel formModel) {
+    private void applyDeterministicFieldSpans(FormModel formModel) {
         List<String> simpleTypes = List.of(
                 "boolean",
                 "Boolean",
@@ -122,7 +136,7 @@ public class FormGenerator {
                 .forEach(field -> field.setColSpan(1));
     }
 
-    private void determineFieldTypes(FormModel formModel) {
+    private void applyDeterministicFieldTypes(FormModel formModel) {
         Map<String, FieldType> fieldTypeMap = new HashMap<>();
 
         fieldTypeMap.put("boolean", FieldType.Checkbox);
@@ -208,7 +222,8 @@ public class FormGenerator {
             }
             // Only use suggested field type if we don't have a deterministic one
             if (field.getFieldType() == null) {
-                field.setFieldType(FieldType.valueOf(suggestedFieldType));
+                FieldType fieldType = parseSuggestedFieldType(suggestedFieldType);
+                field.setFieldType(fieldType);
             }
         });
 
@@ -239,7 +254,7 @@ public class FormGenerator {
 
         for (String line : lines) {
             // detect new section
-            Pattern sectionStartPattern = Pattern.compile("^([\\w-]+):");
+            Pattern sectionStartPattern = Pattern.compile("^([\\w\\s]+):");
             Matcher sectionStartMatcher = sectionStartPattern.matcher(line);
             if (sectionStartMatcher.find()) {
                 // close previous section
@@ -276,7 +291,17 @@ public class FormGenerator {
         if (matcher.find()) {
             return Integer.parseInt(matcher.group());
         } else {
-            throw new IllegalStateException("Failed to parse suggested field length");
+            logger.warn("Failed to parse suggested field length: {}", suggestedFieldLength);
+            return 0;
+        }
+    }
+
+    private FieldType parseSuggestedFieldType(String suggestedFieldType) {
+        try {
+            return FieldType.valueOf(suggestedFieldType);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Failed to parse suggested field type: {}", suggestedFieldType);
+            return FieldType.TextField;
         }
     }
 }
