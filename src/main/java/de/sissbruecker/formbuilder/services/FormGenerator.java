@@ -161,7 +161,11 @@ public class FormGenerator {
 
         formModel.getFields().forEach(field -> {
             if (fieldTypeMap.containsKey(field.getPropertyType())) {
+                // For most primitive types use a deterministic field type
                 field.setFieldType(fieldTypeMap.get(field.getPropertyType()));
+            } else if (!field.getPropertyType().equals("String")) {
+                // For strings let GPT suggest a field, for other unknown types just use a combo box
+                field.setFieldType(FieldType.ComboBox);
             }
         });
     }
