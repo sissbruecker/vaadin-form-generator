@@ -56,7 +56,7 @@ public class FormGenerator {
                 .append("2. Make suggestions for each form field:\n")
                 .append(String.format("  2a. Suggest a label for the field. The labels should be in %s.\n", config.getLanguage()))
                 .append("  2b. Suggest how many characters a user would typically have to enter into each field\n")
-                .append("  2c. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses, and `PasswordField` for passwords.\n")
+                .append("  2c. Suggest a UI control to use for each field. The available controls are `TextField` for single-line texts, `TextArea` for multi-line texts, `EmailField` for email addresses, `PasswordField` for passwords, and `Select` for selecting a value from a small number of options.\n")
                 .append("3. Suggest a good order of the fields, based on how users would typically would want to fill out the form.\n")
                 .append("4. Suggest which fields can be logically grouped together into form groups. Generate a label for each group, which should be in English.\n")
                 .append("\n")
@@ -300,6 +300,8 @@ public class FormGenerator {
 
     private FieldType parseSuggestedFieldType(String suggestedFieldType) {
         try {
+            // Only take first word, and ignore further suggestions for other fields or values
+            suggestedFieldType = suggestedFieldType.split(" ")[0];
             return FieldType.valueOf(suggestedFieldType);
         } catch (IllegalArgumentException e) {
             logger.warn("Failed to parse suggested field type: {}", suggestedFieldType);
