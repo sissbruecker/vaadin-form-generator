@@ -2,7 +2,7 @@
 
 This is a proof of concept for generating Vaadin form layouts from a Java beans.
 
-You basically give it the source code of a Java file, the application parses that and then generates code for a form that allows editing the bean. Most of the application uses "regular" / deterministic code: parsing the bean, determining field types, generating code. That process is enhanced with GPT by:
+You basically give it the source code of a Java bean, the application parses that and then generates a form with fields for every property of the bean. Most of the application uses "regular" / deterministic code: parsing the bean, determining field types, generating code. That process is enhanced with GPT by:
 - Generating field labels in the specified language
 - Bringing fields in a sensible order for filling out the form
 - Grouping related fields and generating a group header
