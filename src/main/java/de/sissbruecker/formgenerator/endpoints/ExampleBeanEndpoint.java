@@ -6,8 +6,8 @@ import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,14 +15,32 @@ import java.util.Objects;
 @AnonymousAllowed
 public class ExampleBeanEndpoint {
 
+    private static final List<String> EXAMPLE_FILES = List.of(
+            "InsuranceReport.java",
+            "Pet.java",
+            "Patient.java",
+            "Employee.java",
+            "UniversityApplicant.java",
+            "PresidentialApplicant.java"
+    );
+
     @Nonnull
-    public List<@Nonnull ExampleBean> loadExampleBeans() throws IOException {
-        return Files.list(Path.of("./examples")).map(beanFile -> {
+    public List<@Nonnull ExampleBean> loadExampleBeans() {
+        return EXAMPLE_FILES.stream().map(filename -> {
             try {
-                return new ExampleBean(beanFile.getFileName().toString(), Files.readString(beanFile));
+                return loadExample(filename);
             } catch (IOException e) {
-                return null;
+                throw new RuntimeException(e);
             }
         }).filter(Objects::nonNull).toList();
+    }
+
+    private static ExampleBean loadExample(String filename) throws IOException {
+        InputStream inputStream = ExampleBeanEndpoint.class.getClassLoader().getResourceAsStream("META-INF/resources/examples/" + filename);
+        if (inputStream == null) {
+            return null;
+        }
+        String sourceCode = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        return new ExampleBean(filename, sourceCode);
     }
 }
