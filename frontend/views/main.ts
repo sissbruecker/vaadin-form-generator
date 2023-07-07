@@ -2,6 +2,7 @@ import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import "@vaadin/text-field";
 import "@vaadin/checkbox";
+import "@vaadin/select";
 import "@vaadin/split-layout";
 import "@vaadin/upload";
 import { Upload, UploadBeforeEvent, UploadI18n } from "@vaadin/upload";
@@ -157,6 +158,17 @@ export class GeneratorView extends LitElement {
     },
   };
 
+  private selectableModels = [
+    {
+      label: "GPT 3.5 turbo ⚡",
+      value: "gpt-3.5-turbo",
+    },
+    {
+      label: "GPT 4 🐢",
+      value: "gpt-4",
+    },
+  ];
+
   get exampleBeanOptions(): ExampleBeanOption[] {
     return this.exampleBeans.map((bean) => ({
       label: bean.filename,
@@ -205,6 +217,17 @@ export class GeneratorView extends LitElement {
                 language: event.target.value,
               })}"
           ></vaadin-text-field>
+          <br />
+          <vaadin-select
+            label="Model"
+            .items="${this.selectableModels}"
+            .value="${this.formConfig.model}"
+            @change="${(event: SelectChangeEvent) =>
+              (this.formConfig = {
+                ...this.formConfig!,
+                model: event.target.value,
+              })}"
+          ></vaadin-select>
           <br />
           <vaadin-custom-field label="Turn up the heat (Temperature)">
             <input

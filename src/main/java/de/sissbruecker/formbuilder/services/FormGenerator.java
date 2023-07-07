@@ -75,7 +75,7 @@ public class FormGenerator {
                 .append("...\n")
                 .append("\n")
                 .append("Groups:\n")
-                .append("- <suggested group name>: <Java property name 1>, <Java property name 2>, ...\n")
+                .append(String.format("- <suggested group name in %s>: <Java property name 1>, <Java property name 2>, ...\n", config.getLanguage()))
                 .append("...");
 
         prompt.append("\n\n")
@@ -104,9 +104,11 @@ public class FormGenerator {
 
 
         logger.debug("suggestions prompt:\n{}", prompt);
-
-        String reply = makeRequest(prompt.toString(), config.getTemperature());
+        long start = System.currentTimeMillis();
+        String reply = makeRequest(prompt.toString(), config);
+        long end = System.currentTimeMillis();
         logger.debug("suggestions reply:\n{}", reply);
+        logger.debug("suggestions request took {}s", (end - start) / 1000);
         parseReply(reply, formModel);
     }
 
@@ -164,10 +166,10 @@ public class FormGenerator {
         });
     }
 
-    private String makeRequest(String prompt, double temperature) {
+    private String makeRequest(String prompt, FormGeneratorConfig config) {
         ChatCompletionRequest request = new ChatCompletionRequest();
-        request.setModel("gpt-3.5-turbo");
-        request.setTemperature(temperature);
+        request.setModel(config.getModel());
+        request.setTemperature(config.getTemperature());
         request.setMessages(List.of(createMessage("user", prompt)));
 
         ChatCompletionResult result = openAiService.createChatCompletion(request);

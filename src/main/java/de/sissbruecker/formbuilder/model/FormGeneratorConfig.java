@@ -8,6 +8,8 @@ public class FormGeneratorConfig {
     @Nonnull
     private String language = "English";
     @Nonnull
+    private String model = "gpt-3.5-turbo";
+    @Nonnull
     private double temperature = 0;
     @Nonnull
     private boolean addGroupHeader = true;
@@ -26,6 +28,14 @@ public class FormGeneratorConfig {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     public double getTemperature() {
