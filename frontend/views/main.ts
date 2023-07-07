@@ -38,21 +38,7 @@ export class GeneratorView extends LitElement {
         margin-right: auto;
         background: white;
       }
-
-      h1 {
-        margin: 0 0 var(--lumo-space-m) 0;
-        font-size: var(--lumo-font-size-xl);
-      }
-
-      h2 {
-        margin: var(--lumo-space-s) 0;
-        font-size: var(--lumo-font-size-m);
-      }
-
-      vaadin-upload {
-        display: inline-block;
-      }
-
+      
       .layout {
         height: 100%;
         display: flex;
@@ -80,6 +66,24 @@ export class GeneratorView extends LitElement {
 
       .output vaadin-scroller {
         width: 100%;
+      }
+
+      h1 {
+        margin: 0 0 var(--lumo-space-m) 0;
+        font-size: var(--lumo-font-size-xl);
+      }
+
+      h2 {
+        margin: var(--lumo-space-s) 0;
+        font-size: var(--lumo-font-size-m);
+      }
+
+      vaadin-upload {
+        display: inline-block;
+      }
+
+      .generate-button {
+        margin-top: var(--lumo-space-m);
       }
 
       /* Set the track and thumb color */
@@ -246,6 +250,16 @@ export class GeneratorView extends LitElement {
               }}"
             />
           </vaadin-custom-field>
+          <br />
+          <vaadin-button
+              theme="primary"
+              class="generate-button"
+              ?disabled="${!this.formConfig.beanSourceCode}"
+              @click="${this.generateForm}"
+          >Generate form
+          </vaadin-button>
+          <br />
+          <br />
           <h2>Rendering Options</h2>
           <vaadin-checkbox
             label="Show group header"
@@ -258,13 +272,16 @@ export class GeneratorView extends LitElement {
           >
           </vaadin-checkbox>
           <br />
-          <br />
-          <vaadin-button
-            theme="primary"
-            ?disabled="${!this.formConfig.beanSourceCode}"
-            @click="${this.generateForm}"
-            >Generate form
-          </vaadin-button>
+          <vaadin-checkbox
+            label="Show generation metadata"
+            ?checked="${this.formConfig.showMetadata}"
+            @checked-changed="${(e: CheckboxCheckedChangedEvent) =>
+              (this.formConfig = {
+                ...this.formConfig!,
+                showMetadata: e.detail.value,
+              })}"
+          >
+          </vaadin-checkbox>
         </div>
         <div class="output">
           ${this.formModel

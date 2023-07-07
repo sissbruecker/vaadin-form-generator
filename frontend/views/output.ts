@@ -48,6 +48,96 @@ export class Output extends LitElement {
     div[tab] {
       padding: var(--lumo-space-m);
     }
+
+    .purpose {
+      display: none;
+      font-size: var(--lumo-font-size-s);
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-bottom: var(--lumo-space-m);
+    }
+
+    .metadata .purpose {
+      display: block;
+    }
+
+    .metadata vaadin-text-field label::after {
+      content: "TextField, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-text-area label::after {
+      content: "TextArea, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-email-field label::after {
+      content: "EmailField, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-integer-field label::after {
+      content: "IntegerField, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-number-field label::after {
+      content: "NumberField, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-password-field label::after {
+      content: "PasswordField, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-date-picker label::after {
+      content: "DatePicker";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-time-picker label::after {
+      content: "TimePicker";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-date-time-picker label::after {
+      content: "DateTimePicker";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-select label::after {
+      content: "Select, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
+    .metadata vaadin-combo-box label::after {
+      content: "ComboBox, ~" attr(chars) " chars";
+      font-style: italic;
+      color: var(--lumo-primary-color-50pct);
+      margin-left: var(--lumo-space-xs);
+    }
+
   `;
 
   @property()
@@ -81,7 +171,7 @@ export class Output extends LitElement {
 
   render() {
     return html`
-      <vaadin-tabsheet>
+      <vaadin-tabsheet class="${this.formConfig?.showMetadata ? 'metadata' : ''}">
         <vaadin-tabs slot="tabs">
           <vaadin-tab id="preview-tab">Preview</vaadin-tab>
           <vaadin-tab id="flow-code-tab">Source code (Flow)</vaadin-tab>
@@ -120,6 +210,9 @@ export class Output extends LitElement {
     }
 
     const renderer = new LitTemplateFormRenderer();
-    return renderer.renderForm(this.formModel, this.formConfig);
+    return html`
+      <div class="purpose">${this.formModel.purpose}</div>
+      ${renderer.renderForm(this.formModel, this.formConfig)}
+    `;
   }
 }

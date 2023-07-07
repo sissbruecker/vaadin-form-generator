@@ -117,9 +117,11 @@ export class LitTemplateFormRenderer extends FormRenderer<TemplateResult> {
     }
 
     return staticHtml` <${fieldTagName}
-        label="${field.displayName}"
         colspan="${field.colSpan}"
-      ></${fieldTagName}>`;
+        chars="50"
+      >
+       <label slot="label" chars="${field.suggestedCharacters}">${field.displayName}</label>
+      </${fieldTagName}>`;
   }
 
   renderGroupHeader(group: FieldGroup): TemplateResult {

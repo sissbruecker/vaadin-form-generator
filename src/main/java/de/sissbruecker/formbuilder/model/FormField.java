@@ -17,6 +17,8 @@ public class FormField {
     private FieldType fieldType;
     @Nonnull
     private FieldType suggestedFieldType;
+    @Nonnull
+    private int suggestedCharacters;
 
     public FormField() {
     }
@@ -83,6 +85,14 @@ public class FormField {
     @JsonIgnore
     public FieldType getEffectiveFieldType() {
         return fieldType != null ? fieldType : suggestedFieldType;
+    }
+
+    public int getSuggestedCharacters() {
+        return suggestedCharacters;
+    }
+
+    public void setSuggestedCharacters(int suggestedCharacters) {
+        this.suggestedCharacters = suggestedCharacters;
     }
 
     @Override

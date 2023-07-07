@@ -218,6 +218,7 @@ public class FormGenerator {
             }
             field.setOrder(index);
             field.setDisplayName(suggestedLabel);
+            field.setSuggestedCharacters(suggestedCharacters);
             // Only use suggested colspan if we don't have a deterministic one
             if (field.getColSpan() == 0) {
                 field.setColSpan(suggestedCharacters >= 50 ? 2 : 1);

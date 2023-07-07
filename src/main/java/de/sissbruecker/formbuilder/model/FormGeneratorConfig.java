@@ -13,6 +13,8 @@ public class FormGeneratorConfig {
     private double temperature = 0;
     @Nonnull
     private boolean addGroupHeader = true;
+    @Nonnull
+    private boolean showMetadata = true;
 
     public String getBeanSourceCode() {
         return beanSourceCode;
@@ -52,5 +54,13 @@ public class FormGeneratorConfig {
 
     public void setAddGroupHeader(boolean addGroupHeader) {
         this.addGroupHeader = addGroupHeader;
+    }
+
+    public boolean isShowMetadata() {
+        return showMetadata;
+    }
+
+    public void setShowMetadata(boolean showMetadata) {
+        this.showMetadata = showMetadata;
     }
 }
