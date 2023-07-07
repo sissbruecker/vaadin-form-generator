@@ -14,8 +14,8 @@ import "@vaadin/date-time-picker";
 import "@vaadin/checkbox";
 import "@vaadin/select";
 import "@vaadin/combo-box";
-import FormGeneratorConfig from "Frontend/generated/de/sissbruecker/formbuilder/model/FormGeneratorConfig";
-import FormModel from "Frontend/generated/de/sissbruecker/formbuilder/model/FormModel";
+import FormGeneratorConfig from "Frontend/generated/de/sissbruecker/formgenerator/model/FormGeneratorConfig";
+import FormModel from "Frontend/generated/de/sissbruecker/formgenerator/model/FormModel";
 import {
   FlowFormRenderer,
   HillaLitFormRenderer,

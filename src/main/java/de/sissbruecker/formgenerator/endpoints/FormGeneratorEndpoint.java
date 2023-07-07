@@ -1,12 +1,12 @@
-package de.sissbruecker.formbuilder.endpoints;
+package de.sissbruecker.formgenerator.endpoints;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sissbruecker.formbuilder.model.BeanModel;
-import de.sissbruecker.formbuilder.model.FormGeneratorConfig;
-import de.sissbruecker.formbuilder.model.FormGeneratorSession;
-import de.sissbruecker.formbuilder.model.FormModel;
-import de.sissbruecker.formbuilder.services.BeanParser;
-import de.sissbruecker.formbuilder.services.FormGenerator;
+import de.sissbruecker.formgenerator.model.BeanModel;
+import de.sissbruecker.formgenerator.model.FormGeneratorConfig;
+import de.sissbruecker.formgenerator.model.FormGeneratorSession;
+import de.sissbruecker.formgenerator.model.FormModel;
+import de.sissbruecker.formgenerator.services.BeanParser;
+import de.sissbruecker.formgenerator.services.FormGenerator;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 

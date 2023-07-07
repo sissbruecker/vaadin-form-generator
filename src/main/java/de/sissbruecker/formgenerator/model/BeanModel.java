@@ -1,4 +1,4 @@
-package de.sissbruecker.formbuilder.model;
+package de.sissbruecker.formgenerator.model;
 
 import java.util.ArrayList;
 import java.util.List;

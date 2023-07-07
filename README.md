@@ -1,16 +1,29 @@
-# Custom project from Hilla
+# vaadin-form-generator
 
-This project can be used as a starting point to create your own Hilla application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+This is a proof of concept for generating Vaadin form layouts from a Java beans.
+
+You basically give it the source code of a Java file, the application parses that and then generates code for a form that allows editing the bean. Most of the application uses "regular" / deterministic code: parsing the bean, determining field types, generating code. That process is enhanced with GPT by:
+- Generating field labels in the specified language
+- Bringing fields in a sensible order for filling out the form
+- Grouping related fields and generating a group header
+- Suggesting sensible field types for string properties (text field, text area, email field, ...)
+- Suggesting how many characters might be entered in a field, which determines how many columns the field spans in the layout
+
+**Screenshot:**
+
+![Screenshot](/docs/screenshot.png?raw=true "Screenshot")
 
 ## Running the application
 
-The project is a standard Maven project. To run it from the command line,
-type `mvnw` (Windows), or `./mvnw` (Mac & Linux), then open
-http://localhost:8080 in your browser.
+The project is a standard Maven project, using Spring Boot, Vaadin Hilla, and Lit for the frontend.
+To run it from the command line, type `mvnw` (Windows), or `./mvnw` (Mac & Linux), then open http://localhost:8080 in your browser.
 
-You can also import the project to your IDE of choice as you would with any
-Maven project.
+**You need an OpenAI API token to run this app.**
+It needs to be defined as the `openai.token` Spring property.
+For example, using Maven:
+```
+mvn -Dspring-boot.run.arguments="--openai.token=..."
+```
 
 ## Deploying to Production
 
@@ -22,25 +35,3 @@ ready to be deployed. The file can be found in the `target` folder after the bui
 Once the JAR file is built, you can run it using
 `java -jar target/myapp-1.0-SNAPSHOT.jar` (NOTE, replace
 `myapp-1.0-SNAPSHOT.jar` with the name of your jar).
-
-## Project structure
-
-<table style="width:100%; text-align: left;">
-  <tr><th>Directory</th><th>Description</th></tr>
-  <tr><td><code>frontend/</code></td><td>Client-side source directory</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.html</code></td><td>HTML template</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.ts</code></td><td>Frontend entrypoint, contains the client-side routing setup using <a href="https://hilla.dev/docs/routing/router">Hilla Router</a></td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>main-layout.ts</code></td><td>Main layout Web Component, contains the navigation menu, uses <a href="https://vaadin.com/docs/latest/ds/components/app-layout">App Layout</a></td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>views/</code></td><td>UI views Web Components (TypeScript)</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>themes/</code></td><td>Custom  
-CSS styles</td></tr>
-  <tr><td><code>src/main/java/&lt;groupId&gt;/</code></td><td>Server-side 
-source directory, contains the server-side Java views</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>Application.java</code></td><td>Server entry-point</td></tr>
-</table>
-
-## Useful links
-
-- Read the documentation at [hilla.dev/docs](https://hilla.dev/docs/).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/hilla) or join our [Discord channel](https://discord.gg/MYFq5RTbBn).
-- Report issues, create pull requests in [GitHub](https://github.com/vaadin/hilla).

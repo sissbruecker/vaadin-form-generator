@@ -1,9 +1,9 @@
 import { html, TemplateResult } from "lit";
 import { html as staticHtml, literal, StaticValue } from "lit/static-html.js";
-import FieldGroup from "Frontend/generated/de/sissbruecker/formbuilder/model/FieldGroup";
-import FormModel from "Frontend/generated/de/sissbruecker/formbuilder/model/FormModel";
-import FormField from "Frontend/generated/de/sissbruecker/formbuilder/model/FormField";
-import FieldType from "Frontend/generated/de/sissbruecker/formbuilder/model/FieldType";
+import FieldGroup from "Frontend/generated/de/sissbruecker/formgenerator/model/FieldGroup";
+import FormModel from "Frontend/generated/de/sissbruecker/formgenerator/model/FormModel";
+import FormField from "Frontend/generated/de/sissbruecker/formgenerator/model/FormField";
+import FieldType from "Frontend/generated/de/sissbruecker/formgenerator/model/FieldType";
 
 export interface RenderOptions {
   addGroupHeader: boolean;

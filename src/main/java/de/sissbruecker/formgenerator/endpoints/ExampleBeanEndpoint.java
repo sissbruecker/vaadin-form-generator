@@ -1,7 +1,7 @@
-package de.sissbruecker.formbuilder.endpoints;
+package de.sissbruecker.formgenerator.endpoints;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sissbruecker.formbuilder.model.ExampleBean;
+import de.sissbruecker.formgenerator.model.ExampleBean;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 

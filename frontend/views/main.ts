@@ -11,13 +11,13 @@ import { SelectChangeEvent } from "@vaadin/select";
 import { Notification } from "@vaadin/notification";
 import { TextFieldChangeEvent } from "@vaadin/text-field";
 import { CheckboxCheckedChangedEvent } from "@vaadin/checkbox";
-import FormGeneratorConfig from "Frontend/generated/de/sissbruecker/formbuilder/model/FormGeneratorConfig";
-import ExampleBean from "Frontend/generated/de/sissbruecker/formbuilder/model/ExampleBean";
+import FormGeneratorConfig from "Frontend/generated/de/sissbruecker/formgenerator/model/FormGeneratorConfig";
+import ExampleBean from "Frontend/generated/de/sissbruecker/formgenerator/model/ExampleBean";
 import {
   ExampleBeanEndpoint,
   FormGeneratorEndpoint,
 } from "Frontend/generated/endpoints";
-import FormModel from "Frontend/generated/de/sissbruecker/formbuilder/model/FormModel";
+import FormModel from "Frontend/generated/de/sissbruecker/formgenerator/model/FormModel";
 import "./code-view";
 import "./empty";
 import "./output";

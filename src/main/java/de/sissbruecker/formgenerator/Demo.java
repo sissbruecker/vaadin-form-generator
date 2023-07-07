@@ -1,21 +1,20 @@
-package de.sissbruecker.formbuilder;
+package de.sissbruecker.formgenerator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.service.OpenAiService;
-import de.sissbruecker.formbuilder.model.BeanModel;
-import de.sissbruecker.formbuilder.model.BeanProperty;
-import de.sissbruecker.formbuilder.model.FormGeneratorConfig;
-import de.sissbruecker.formbuilder.model.FormModel;
-import de.sissbruecker.formbuilder.services.CodeGenerator;
-import de.sissbruecker.formbuilder.services.FormGenerator;
-import de.sissbruecker.formbuilder.services.BeanParser;
+import de.sissbruecker.formgenerator.model.BeanModel;
+import de.sissbruecker.formgenerator.model.BeanProperty;
+import de.sissbruecker.formgenerator.model.FormGeneratorConfig;
+import de.sissbruecker.formgenerator.model.FormModel;
+import de.sissbruecker.formgenerator.services.CodeGenerator;
+import de.sissbruecker.formgenerator.services.FormGenerator;
+import de.sissbruecker.formgenerator.services.BeanParser;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.Optional;
 
 public class Demo {
     public static void main(String[] args) throws IOException {

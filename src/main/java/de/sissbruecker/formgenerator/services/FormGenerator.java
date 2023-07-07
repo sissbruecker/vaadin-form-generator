@@ -1,16 +1,16 @@
-package de.sissbruecker.formbuilder.services;
+package de.sissbruecker.formgenerator.services;
 
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
-import de.sissbruecker.formbuilder.model.BeanModel;
-import de.sissbruecker.formbuilder.model.FieldGroup;
-import de.sissbruecker.formbuilder.model.FieldType;
-import de.sissbruecker.formbuilder.model.FormField;
-import de.sissbruecker.formbuilder.model.FormGeneratorConfig;
-import de.sissbruecker.formbuilder.model.FormModel;
+import de.sissbruecker.formgenerator.model.BeanModel;
+import de.sissbruecker.formgenerator.model.FieldGroup;
+import de.sissbruecker.formgenerator.model.FieldType;
+import de.sissbruecker.formgenerator.model.FormField;
+import de.sissbruecker.formgenerator.model.FormGeneratorConfig;
+import de.sissbruecker.formgenerator.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

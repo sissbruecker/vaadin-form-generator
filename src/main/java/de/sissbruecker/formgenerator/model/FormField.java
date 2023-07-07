@@ -1,4 +1,4 @@
-package de.sissbruecker.formbuilder.model;
+package de.sissbruecker.formgenerator.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.hilla.Nonnull;

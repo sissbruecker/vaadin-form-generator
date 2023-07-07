@@ -1,12 +1,12 @@
-package de.sissbruecker.formbuilder.services;
+package de.sissbruecker.formgenerator.services;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import de.sissbruecker.formbuilder.model.BeanModel;
-import de.sissbruecker.formbuilder.model.BeanProperty;
+import de.sissbruecker.formgenerator.model.BeanModel;
+import de.sissbruecker.formgenerator.model.BeanProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

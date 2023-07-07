@@ -1,4 +1,4 @@
-package de.sissbruecker.formbuilder.config;
+package de.sissbruecker.formgenerator.config;
 
 import com.theokanning.openai.service.OpenAiService;
 import org.springframework.beans.factory.annotation.Value;

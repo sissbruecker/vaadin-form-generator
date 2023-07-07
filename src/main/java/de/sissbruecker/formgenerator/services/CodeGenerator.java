@@ -1,8 +1,8 @@
-package de.sissbruecker.formbuilder.services;
+package de.sissbruecker.formgenerator.services;
 
-import de.sissbruecker.formbuilder.model.FieldType;
-import de.sissbruecker.formbuilder.model.FormField;
-import de.sissbruecker.formbuilder.model.FormModel;
+import de.sissbruecker.formgenerator.model.FieldType;
+import de.sissbruecker.formgenerator.model.FormField;
+import de.sissbruecker.formgenerator.model.FormModel;
 
 public class CodeGenerator {
     public String generateCode(FormModel formModel) {

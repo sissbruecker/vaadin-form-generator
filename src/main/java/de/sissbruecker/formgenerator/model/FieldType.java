@@ -1,4 +1,4 @@
-package de.sissbruecker.formbuilder.model;
+package de.sissbruecker.formgenerator.model;
 
 public enum FieldType {
     TextField,

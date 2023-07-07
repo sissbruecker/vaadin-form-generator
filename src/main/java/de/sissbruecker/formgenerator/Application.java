@@ -1,8 +1,8 @@
-package de.sissbruecker.formbuilder;
+package de.sissbruecker.formgenerator;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
-import de.sissbruecker.formbuilder.model.FormGeneratorSession;
+import de.sissbruecker.formgenerator.model.FormGeneratorSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import org.springframework.web.context.annotation.SessionScope;
  *
  */
 @SpringBootApplication
-@Theme(value = "vaadin-form-builder")
+@Theme(value = "vaadin-form-generator")
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
